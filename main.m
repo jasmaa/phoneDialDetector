@@ -19,14 +19,45 @@ end
 
 [number, Fs] = audioread('answering_machine_code.wav');
 
-number
+%number
 
-sound(number)
+%sound(number)
 
 % recover tones
+
+% 0001 - 4000
+% 8000 - 12000
+% 16000 - 20000
 tone1 = number(1:0.5*Fs);
 tone2 = number(1*Fs+1:1.5*Fs);
 tone3 = number(2*Fs+1:2.5*Fs);
+
+toneArray = [];
+head = 1;
+while head < length(number);
+  s = number(head);
+  if abs(s) > 0;
+    tail = head;
+    while abs(s) > 0;
+      s = number(tail);
+      tail++;
+      
+      % Rudimentary check 1 value over
+      if tail < length(number) && abs(number(tail)) > 0;
+        s = number(tail);
+        tail++;
+      end
+    end
+    
+    head
+    tail
+    disp("---")
+    tone = number(head:tail-1);
+    
+    head = tail;
+  end
+  head++;
+end
 
 % find dial  
 rowFreq = [1209 1336 1477 1633];
@@ -36,8 +67,8 @@ colFreq = [697 770 852 941];
 for row = rowFreq;
   for col = colFreq;
     if innerProd(row, tone3) > 0.5 && innerProd(col, tone3) > 0.5
-      row
-      col
+      row;
+      col;
     end
   end
 end
