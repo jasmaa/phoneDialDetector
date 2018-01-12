@@ -11,28 +11,21 @@ Notes:
 
 %}
 
-function y = innerProd(f, tone)
+% funcs
+function y = innerProd(f, tone, valRange)
   % temp range for t
-  t = linspace(0, 0.5, 4000)';
+  t = linspace(0, 0.5, valRange)';
   y = 4*trapz(t, sin(2*pi*f*t).*tone);
 end
 
-[number, Fs] = audioread('answering_machine_code.wav');
+[number, Fs] = audioread('sample01.wav');
 
-%number
+% Set vals  
+rowFreq = [1209 1336 1477 1633];
+colFreq = [697 770 852 941];
+thresh = 0.2
 
-%sound(number)
-
-% recover tones
-
-% 0001 - 4000
-% 8000 - 12000
-% 16000 - 20000
-tone1 = number(1:0.5*Fs);
-tone2 = number(1*Fs+1:1.5*Fs);
-tone3 = number(2*Fs+1:2.5*Fs);
-
-toneArray = [];
+% Main loop
 head = 1;
 while head < length(number);
   s = number(head);
@@ -49,26 +42,22 @@ while head < length(number);
       end
     end
     
-    head
-    tail
     disp("---")
     tone = number(head:tail-1);
+
+    % analyze tone
+    % loop thru freq and get weights by inner product
+    innerProd(row, tone, tail-head)
+    for row = rowFreq;
+      for col = colFreq;
+        if innerProd(row, tone, tail-head) > thresh && innerProd(col, tone, tail-head) > thresh
+          row
+          col
+        end
+      end
+    end
     
     head = tail;
   end
   head++;
-end
-
-% find dial  
-rowFreq = [1209 1336 1477 1633];
-colFreq = [697 770 852 941];
-
-% loop thru freq and get weights by inner product
-for row = rowFreq;
-  for col = colFreq;
-    if innerProd(row, tone3) > 0.5 && innerProd(col, tone3) > 0.5
-      row;
-      col;
-    end
-  end
 end
