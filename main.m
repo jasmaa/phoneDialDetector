@@ -18,13 +18,16 @@ function y = innerProd(f, inp, valRange)
   y = 4*trapz(t, sin(2*pi*f*t).*inp);
 end
 
-%dtmf_112163
+% Sample dial
 [number, Fs] = audioread('dtmf_112163.wav');
-[divider, Fs1] = audioread('ding.wav');
 
 % Set vals  
-freqList = [1209 1336 1477 1633 697 770 852 941];
-thresh = 0.001
+rowList = [1209 1336 1477 1633];
+colList = [697 770 852 941];
+
+dialArray = ["1" "2" "3" "A"; "4" "5" "6" "B"; "7" "8" "9" "C"; "*" "0" "#" "D"];
+
+thresh = 0.01;
 
 % Main loop
 head = 1;
@@ -47,22 +50,49 @@ while head < length(number);
     counter++;
     
     % display stuff
-    disp("---")
-    counter
+    %disp("---")
+    %counter
+
+    % determine if long enough
+    if ((tail-head) / Fs) < thresh;
+      head = tail;
+      continue
+    end
     
     tone = number(head:tail-1);
     
     % analyze tone
     % loop thru freq and get weights by inner product
-    for f = freqList;
+    currentMax = 0;
+    currentRow = -1;
+    for i = 1:length(rowList);
       % calculate inner product
+      f = rowList(i);
       t = linspace(0, (tail-head) / Fs, tail-head)';
       y = 4*trapz(t, sin(2*pi*f*t).*tone);
       
-      if y > thresh;
-        f
+      if abs(y) > currentMax;
+        currentRow = i;
+        currentMax = abs(y);
       end
     end
+    
+    currentMax = 0;
+    currentCol = -1;
+    for j = 1:length(colList);
+      % calculate inner product
+      f = colList(j);
+      t = linspace(0, (tail-head) / Fs, tail-head)';
+      y = 4*trapz(t, sin(2*pi*f*t).*tone);
+      
+      if abs(y) > currentMax;
+        currentCol = j;
+        currentMax = abs(y);
+      end
+    end
+    
+    % print correct symbol
+    dialArray(currentCol, currentRow)
     
     head = tail;
   end
