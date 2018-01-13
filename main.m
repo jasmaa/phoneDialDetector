@@ -19,7 +19,7 @@ function y = innerProd(f, inp, valRange)
 end
 
 % Sample dial
-[number, Fs] = audioread('dtmf_112163.wav');
+[number, Fs] = audioread("dtmf_112163.wav");
 
 % Set vals  
 rowList = [1209 1336 1477 1633];
